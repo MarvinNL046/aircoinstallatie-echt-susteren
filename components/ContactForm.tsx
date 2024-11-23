@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import emailjs from '@emailjs/browser';
@@ -17,6 +17,8 @@ const formSchema = z.object({
   message: z.string().min(10, 'Bericht is te kort'),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -26,15 +28,21 @@ export default function ContactForm() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      message: '',
+    },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsSubmitting(true);
     
     try {
-      await emailjs.send(
+      const result = await emailjs.send(
         'service_1rruujp',
         'template_rkcpzhg',
         {
@@ -47,13 +55,18 @@ export default function ContactForm() {
         'sjJ8kK6U9wFjY0zX9'
       );
 
-      toast({
-        title: "Aanvraag verzonden!",
-        description: "We nemen zo spoedig mogelijk contact met u op.",
-      });
-      
-      reset();
+      if (result.status === 200) {
+        toast({
+          title: "Aanvraag verzonden!",
+          description: "We nemen zo spoedig mogelijk contact met u op.",
+        });
+        
+        reset();
+      } else {
+        throw new Error('Failed to send email');
+      }
     } catch (error) {
+      console.error('Contact form error:', error);
       toast({
         title: "Er is iets misgegaan",
         description: "Probeer het later opnieuw of neem telefonisch contact op.",
@@ -71,9 +84,10 @@ export default function ContactForm() {
           placeholder="Uw naam"
           {...register('name')}
           className={errors.name ? 'border-red-500' : ''}
+          disabled={isSubmitting}
         />
         {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name.message as string}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
         )}
       </div>
 
@@ -83,9 +97,10 @@ export default function ContactForm() {
           placeholder="E-mailadres"
           {...register('email')}
           className={errors.email ? 'border-red-500' : ''}
+          disabled={isSubmitting}
         />
         {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
 
@@ -95,9 +110,10 @@ export default function ContactForm() {
           placeholder="Telefoonnummer"
           {...register('phone')}
           className={errors.phone ? 'border-red-500' : ''}
+          disabled={isSubmitting}
         />
         {errors.phone && (
-          <p className="text-red-500 text-sm mt-1">{errors.phone.message as string}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
         )}
       </div>
 
@@ -107,9 +123,10 @@ export default function ContactForm() {
           {...register('message')}
           className={errors.message ? 'border-red-500' : ''}
           rows={4}
+          disabled={isSubmitting}
         />
         {errors.message && (
-          <p className="text-red-500 text-sm mt-1">{errors.message.message as string}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>
         )}
       </div>
 
