@@ -42,6 +42,8 @@ export default function Schema() {
       }
     ],
     priceRange: '€€',
+    paymentAccepted: ['Cash', 'Credit Card', 'Bank Transfer', 'iDEAL'],
+    currenciesAccepted: 'EUR',
     areaServed: {
       '@type': 'GeoCircle',
       geoMidpoint: {
@@ -127,10 +129,31 @@ export default function Schema() {
     }
   };
 
+  const specialAnnouncement = {
+    '@context': 'https://schema.org',
+    '@type': 'SpecialAnnouncement',
+    name: 'Winteractie 2025 - Bespaar nu op uw airco installatie',
+    text: 'Profiteer nu van onze winterkorting! Tot 20% korting op complete airco installaties. Inclusief gratis eerste onderhoudsbeurt.',
+    datePosted: '2025-01-15',
+    expires: '2025-03-31',
+    category: 'https://www.wikidata.org/wiki/Q81068910',
+    announcementLocation: {
+      '@type': 'LocalBusiness',
+      name: 'Airco Installatie Echt-Susteren',
+      url: 'https://aircoinstallatie-echt-susteren.nl'
+    }
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(specialAnnouncement) }}
+      />
+    </>
   );
 }
