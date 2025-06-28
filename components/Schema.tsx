@@ -2,23 +2,25 @@ export default function Schema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'Staycool Airconditioning',
-    description: 'Specialist in energiezuinige airconditioning installatie in Echt-Susteren. Verwarmen & koelen met één systeem, ideaal in combinatie met zonnepanelen.',
+    name: 'Airco Installatie Echt-Susteren',
+    description: 'Specialist in airco installatie Echt-Susteren en heel Limburg. Installatie, onderhoud en reparatie van airconditioners. Bespaar op energiekosten met moderne airco systemen.',
     image: 'https://images.unsplash.com/photo-1631545806609-35d4ae440431?auto=format&fit=crop&q=80',
     '@id': 'https://aircoinstallatie-echt-susteren.nl',
     url: 'https://aircoinstallatie-echt-susteren.nl',
-    telephone: '0636481054',
+    telephone: '046 202 1430',
     email: 'info@staycoolairco.nl',
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Echt-Susteren',
+      streetAddress: 'Aan de Bogen 11',
+      addressLocality: 'Nieuwstadt',
+      postalCode: '6118 AS',
       addressRegion: 'Limburg',
       addressCountry: 'NL'
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 51.1017,
-      longitude: 5.8783
+      latitude: 51.0389,
+      longitude: 5.8611
     },
     openingHoursSpecification: [
       {
@@ -27,17 +29,16 @@ export default function Schema() {
           'Monday',
           'Tuesday',
           'Wednesday',
-          'Thursday',
-          'Friday'
+          'Thursday'
         ],
-        opens: '08:00',
+        opens: '09:00',
         closes: '17:00'
       },
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: 'Saturday',
+        dayOfWeek: 'Friday',
         opens: '09:00',
-        closes: '13:00'
+        closes: '16:00'
       }
     ],
     priceRange: '€€',
@@ -53,6 +54,46 @@ export default function Schema() {
     sameAs: [
       'https://www.facebook.com/staycoolairco',
       'https://www.instagram.com/staycoolairco'
+    ],
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.7',
+      bestRating: '5',
+      worstRating: '1',
+      ratingCount: '163',
+      reviewCount: '163'
+    },
+    review: [
+      {
+        '@type': 'Review',
+        author: {
+          '@type': 'Person',
+          name: 'Jan van der Berg'
+        },
+        datePublished: '2024-01-15',
+        reviewBody: 'Uitstekende service! Binnen een week was onze airco geïnstalleerd. Zeer professioneel en netjes gewerkt.',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: '5',
+          bestRating: '5',
+          worstRating: '1'
+        }
+      },
+      {
+        '@type': 'Review',
+        author: {
+          '@type': 'Person',
+          name: 'Maria Janssen'
+        },
+        datePublished: '2024-02-20',
+        reviewBody: 'Goede prijs-kwaliteit verhouding. De monteurs waren vriendelijk en hebben alles perfect uitgelegd.',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: '5',
+          bestRating: '5',
+          worstRating: '1'
+        }
+      }
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',

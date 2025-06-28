@@ -1,0 +1,18 @@
+# Robots.txt voor aircoinstallatie-echt-susteren.nl
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /node_modules/
+
+# Sitemap locatie
+Sitemap: https://aircoinstallatie-echt-susteren.nl/sitemap.xml
+
+# Crawl-delay voor bots die het respecteren
+Crawl-delay: 1
+
+# Specifieke regels voor Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
