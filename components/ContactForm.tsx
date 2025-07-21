@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import emailjs from '@emailjs/browser';
+import { sendEmail } from '@/utils/email';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -48,31 +48,21 @@ export default function ContactForm() {
     setIsSubmitting(true);
     
     try {
-      const result = await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        {
-          from_name: data.name,
-          from_email: data.email,
-          phone: data.phone,
-          postcode: data.postcode,
-          service: data.service,
-          message: data.message || 'Geen aanvullend bericht',
-          to_name: 'Airco Installatie Echt-Susteren',
-        },
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
+      await sendEmail({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        postcode: data.postcode,
+        service: data.service,
+        message: data.message,
+      });
 
-      if (result.status === 200) {
-        toast({
-          title: "Aanvraag verzonden!",
-          description: "We nemen binnen 24 uur contact met u op.",
-        });
-        
-        reset();
-      } else {
-        throw new Error('Failed to send email');
-      }
+      toast({
+        title: "Aanvraag verzonden!",
+        description: "We nemen binnen 24 uur contact met u op.",
+      });
+      
+      reset();
     } catch (error) {
       console.error('Contact form error:', error);
       toast({

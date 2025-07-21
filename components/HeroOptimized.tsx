@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import emailjs from '@emailjs/browser';
+import { sendEmail } from '@/utils/email';
 import { useToast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
@@ -55,26 +55,18 @@ export default function HeroOptimized() {
     setIsSubmitting(true);
     
     try {
-      const result = await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        {
-          from_name: data.name,
-          phone: data.phone,
-          postcode: data.postcode,
-          message: data.message || 'Geen bericht',
-          to_name: 'Airco Installatie Echt-Susteren',
-        },
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
+      await sendEmail({
+        name: data.name,
+        phone: data.phone,
+        postcode: data.postcode,
+        message: data.message,
+      });
 
-      if (result.status === 200) {
-        toast({
-          title: "Aanvraag verzonden!",
-          description: "Binnen 24 uur ontvangt u een reactie van ons.",
-        });
-        reset();
-      }
+      toast({
+        title: "Aanvraag verzonden!",
+        description: "Binnen 24 uur ontvangt u een reactie van ons.",
+      });
+      reset();
     } catch (error) {
       toast({
         title: "Er is iets misgegaan",
