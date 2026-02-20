@@ -67,6 +67,11 @@ export default function HeroOptimized() {
         description: "Binnen 24 uur ontvangt u een reactie van ons.",
       });
       reset();
+
+      // Redirect to thank you page after short delay
+      setTimeout(() => {
+        window.location.href = 'https://staycoolairco.nl/tot-snel';
+      }, 1500);
     } catch (error) {
       toast({
         title: "Er is iets misgegaan",

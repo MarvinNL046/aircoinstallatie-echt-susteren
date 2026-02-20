@@ -61,8 +61,13 @@ export default function ContactForm() {
         title: "Aanvraag verzonden!",
         description: "We nemen binnen 24 uur contact met u op.",
       });
-      
+
       reset();
+
+      // Redirect to thank you page after short delay
+      setTimeout(() => {
+        window.location.href = 'https://staycoolairco.nl/tot-snel';
+      }, 1500);
     } catch (error) {
       console.error('Contact form error:', error);
       toast({

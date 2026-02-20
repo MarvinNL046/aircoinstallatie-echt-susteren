@@ -3,8 +3,9 @@ import emailjs from '@emailjs/browser';
 // Debug mode - set to true for troubleshooting
 const DEBUG_MODE = false;
 
-// GoHighLevel webhook URL
-const WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/k90zUH3RgEQLfj7Yc55b/webhook-trigger/54670718-ea44-43a1-a81a-680ab3d5f67f";
+// LeadFlow CRM configuration
+const LEADFLOW_URL = "https://wetryleadflow.com/api/webhooks/leads";
+const LEADFLOW_API_KEY = "lf_lRyHo1ENukt9VsG9gYT8EKeDA_nKuoQ1";
 
 // Email data interface
 export interface EmailData {
@@ -17,40 +18,54 @@ export interface EmailData {
   message?: string;
 }
 
-// Send data to GoHighLevel webhook
-const sendToWebhook = async (data: EmailData): Promise<boolean> => {
+// Send data to LeadFlow CRM
+const sendToLeadflow = async (data: EmailData): Promise<boolean> => {
   try {
-    const webhookData = {
-      data: {
-        name: data.name,
-        email: data.email || '',
-        phone: data.phone,
+    const nameParts = data.name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const leadflowData = {
+      firstName,
+      lastName,
+      email: data.email || '',
+      phone: data.phone,
+      message: data.message,
+      source: 'website-contact',
+      customFields: {
         city: data.city || data.postcode || '',
-        message: data.message || 'Geen aanvullend bericht'
+        woonplaats: data.city || data.postcode || ''
       }
     };
 
     if (DEBUG_MODE) {
-      console.log('Sending to webhook:', webhookData);
+      console.log('Sending data to Leadflow CRM:', leadflowData);
     }
 
-    const response = await fetch(WEBHOOK_URL, {
+    const response = await fetch(LEADFLOW_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-API-Key": LEADFLOW_API_KEY
       },
-      body: JSON.stringify(webhookData)
+      body: JSON.stringify(leadflowData)
     });
 
-    if (DEBUG_MODE) {
-      console.log('Webhook response status:', response.status);
-      console.log('Webhook response:', await response.clone().text());
+    if (!response.ok) {
+      const errorText = await response.text();
+      if (DEBUG_MODE) {
+        console.error(`Leadflow error (${response.status}):`, errorText);
+      }
+      return false;
     }
 
-    return response.ok;
+    if (DEBUG_MODE) {
+      console.log('Leadflow submission successful');
+    }
+    return true;
   } catch (error) {
     if (DEBUG_MODE) {
-      console.error('Webhook error:', error);
+      console.error('Leadflow submission failed:', error);
     }
     return false;
   }
@@ -99,31 +114,30 @@ export const sendEmail = async (data: EmailData): Promise<void> => {
     console.log('Starting dual submission with data:', data);
   }
 
-  // Send to both services in parallel
-  const [emailJSSuccess, webhookSuccess] = await Promise.allSettled([
+  // Send to all services in parallel
+  const [emailJSSuccess, leadflowSuccess] = await Promise.allSettled([
     sendViaEmailJS(data),
-    sendToWebhook(data)
+    sendToLeadflow(data)
   ]);
 
   const emailJSResult = emailJSSuccess.status === 'fulfilled' && emailJSSuccess.value;
-  const webhookResult = webhookSuccess.status === 'fulfilled' && webhookSuccess.value;
+  const leadflowResult = leadflowSuccess.status === 'fulfilled' && leadflowSuccess.value;
 
   if (DEBUG_MODE) {
     console.log('EmailJS success:', emailJSResult);
-    console.log('Webhook success:', webhookResult);
+    console.log('Leadflow success:', leadflowResult);
   }
 
-  // Only throw error if BOTH methods fail
-  if (!emailJSResult && !webhookResult) {
-    throw new Error('Failed to send contact form data via both EmailJS and webhook');
+  // Only throw error if ALL methods fail
+  if (!emailJSResult && !leadflowResult) {
+    throw new Error('Failed to send contact form data via EmailJS and Leadflow');
   }
 
   // Log successful submissions for monitoring
-  if (emailJSResult && webhookResult) {
-    if (DEBUG_MODE) console.log('✅ Both submissions successful');
-  } else if (emailJSResult) {
-    if (DEBUG_MODE) console.log('✅ EmailJS successful, ⚠️ Webhook failed');
-  } else if (webhookResult) {
-    if (DEBUG_MODE) console.log('⚠️ EmailJS failed, ✅ Webhook successful');
+  if (DEBUG_MODE) {
+    const methods = [];
+    if (emailJSResult) methods.push('EmailJS');
+    if (leadflowResult) methods.push('Leadflow');
+    console.log(`Successful submissions: ${methods.join(', ')}`);
   }
 };
