@@ -72,6 +72,17 @@ export default function RootLayout({
   return (
     <html lang="nl" suppressHydrationWarning>
       <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-VEHXR9X692" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-VEHXR9X692');
+            `,
+          }}
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#1d4ed8" />
         <meta name="google-site-verification" content="WUj-HZ4NIBy7LEYbbwoeqBhte7YF0mx4GFtl4YuohkI" />
